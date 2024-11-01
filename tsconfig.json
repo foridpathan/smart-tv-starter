@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "ES5",
+    "jsx": "react-jsx",
+    "lib": ["es5", "es6", "dom", "dom.iterable", "esnext"],
+
+    /* Bundler mode */
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "checkJs": false,
+    "allowSyntheticDefaultImports": false,
+
+    "noImplicitAny": false,
+    "stripInternal": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+    /* Linting */
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "esModuleInterop": false,
+    "strict": false,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "exclude": ["node_modules", "./config"],
+  "include": ["./src"]
+}

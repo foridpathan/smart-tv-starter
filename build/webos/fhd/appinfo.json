@@ -1,0 +1,38 @@
+{
+  "id": "com.appid.webos",
+  "title": "Sample APP Title",
+  "main": "index.html",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "type": "web",
+  "vendor": "Forid Pathan",
+  "version": "1.0.0",
+  "appDescription": "App Description",
+  "resolution": "1280x720",
+  "bgColor": "#0a0209",
+  "iconColor": "#FA3282",
+  "bgImage": "Splash.png",
+  "closeOnRotation": false,
+  "disableBackHistoryAPI": true,
+  "handlesRelaunch": false,
+  "splashBackground": "Splash.png",
+  "splashColor": "#0a0209",
+  "splashFitModeOnPortrait": "width",
+  "requiredMemory": 20,
+  "supportPortraitMode": true,
+  "supportTouchMode": "virtual",
+  "transparent": false,
+  "virtualTouch": {
+    "verticalThreshold": 20,
+    "horizontalThreshold": 50,
+    "positionEventOnPress": true,
+    "shortTouchThreshold": 30
+  },
+  "accessibility": {
+    "supportsAudioGuidance": true
+  },
+  "allowedUrls": [
+    "http://*",
+    "https://*"
+  ]
+}

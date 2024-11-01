@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="https://sample.com/webos" version="1.0.0" viewmodes="maximized">
+    <tizen:application id="yD1N2VyDH1.appID" package="yD1N2VyDH1" required_version="2.4"/>
+    <content src="index.html"/>
+    <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
+
+    <icon src="icon.png"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/prelaunch.support" value="true"/>
+    <tizen:metadata key="http://tizen.org/metadata/app_ui_type/base_screen_resolution" value="extensive"/>
+    <name>App Title</name>
+    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:profile name="tv-samsung"/>
+    <tizen:setting screen-orientation="landscape" context-menu="enable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+	
+	<feature name="http://tizen.org/feature/download"/>
+    <feature name="http://tizen.org/feature/network.internet"/>
+    <feature name="http://tizen.org/feature/network.net_proxy"/>
+    <feature name="http://tizen.org/feature/network.secure_element"/>
+    <feature name="http://tizen.org/feature/network.wifi"/>
+    <feature name="http://tizen.org/feature/web.service"/>
+
+	<access origin="*" subdomains="true"></access>
+
+    <tizen:privilege name="http://tizen.org/privilege/network.get"/>
+	<tizen:privilege name="http://tizen.org/privilege/internet"/>
+	<tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
+   	<tizen:privilege name="http://tizen.org/privilege/websetting"/>
+    <tizen:privilege name="http://tizen.org/privilege/apphistory.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/download"/>
+    <tizen:privilege name="http://tizen.org/privilege/mediacapture"/>
+    <tizen:privilege name="http://tizen.org/privilege/mediacontroller.client"/>
+    <tizen:privilege name="http://tizen.org/privilege/mediacontroller.server"/>
+    <tizen:privilege name="http://tizen.org/privilege/notification"/>
+    <tizen:privilege name="http://tizen.org/privilege/package.info"/>
+    <tizen:privilege name="http://tizen.org/privilege/recorder"/>
+    <tizen:privilege name="http://tizen.org/privilege/secureelement"/>
+    <tizen:privilege name="http://tizen.org/privilege/setting"/>
+    <tizen:privilege name="http://tizen.org/privilege/system"/>
+    <tizen:privilege name="http://tizen.org/privilege/unlimitedstorage"/>
+    <tizen:privilege name="http://tizen.org/privilege/volume.set"/>
+    <tizen:privilege name="http://tizen.org/privilege/widget.viewer"/>
+    <tizen:privilege name="http://tizen.org/privilege/appmanager.launch"/>
+    <tizen:privilege name="http://tizen.org/privilege/externalstorage"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
+    <tizen:privilege name="http://tizen.org/privilege/fullscreen"/>
+    <tizen:privilege name="http://tizen.org/privilege/nfc.common"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.audio"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.display"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.window"/>
+    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:privilege name="http://tizen.org/privilege/http"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/drmplay"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/productinfo"/>
+
+</widget>
