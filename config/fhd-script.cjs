@@ -7,8 +7,8 @@ ncp.limit = 16;
 
 const webosConfigFHD = "config/fhd";
 
-const webosBuild = "build/webos/uhd";
-const webosBuildFHD = "build/webos/fhd";
+const webosBuild = "platform/webos/uhd";
+const webosBuildFHD = "platform/webos/fhd";
 fs.emptyDir(webosBuildFHD, function (err) {
   if (err) {
     return console.error(err);

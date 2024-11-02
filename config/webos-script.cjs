@@ -1,9 +1,8 @@
 /* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require("fs");
 const path = require("path");
 
-const webosBuildDir = path.resolve("build/webos/uhd");
+const webosBuildDir = path.resolve("platform/webos/uhd");
 const htmlFilePath = path.resolve(webosBuildDir, "index.html");
 
 if (fs.existsSync(htmlFilePath)) {

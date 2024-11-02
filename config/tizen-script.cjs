@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const tizenBuildDir = path.resolve("build/tizen");
+const tizenBuildDir = path.resolve("platform/tizen");
 const htmlFilePath = path.resolve(tizenBuildDir, "index.html");
 
 if (fs.existsSync(htmlFilePath)) {

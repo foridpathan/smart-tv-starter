@@ -9,8 +9,8 @@ const mode = process.argv[2];
 const tizenConfig = "config/tizen";
 const webosConfig = "config/webos";
 
-const tizenBuild = "build/tizen";
-const webosBuild = "build/webos/uhd";
+const tizenBuild = "platform/tizen";
+const webosBuild = "platform/webos/uhd";
 
 if (mode === "tizen") {
   ncp(tizenConfig, tizenBuild, function (err) {

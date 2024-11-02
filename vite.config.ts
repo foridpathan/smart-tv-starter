@@ -12,8 +12,8 @@ export default defineConfig(() => {
   const tizen = "tizen";
   const webos = "webos";
 
-  const tizenBuild = "build/tizen";
-  const webosBuild = "build/webos/uhd";
+  const tizenBuild = "platform/tizen";
+  const webosBuild = "platform/webos/uhd";
 
   // Determine the output directory based on the mode
   const isTizen = WEBPACK_MODE === tizen;
@@ -22,7 +22,7 @@ export default defineConfig(() => {
     ? tizenBuild
     : isWebOS
     ? webosBuild
-    : "build/production";
+    : "build";
   const env = loadEnv(WEBPACK_MODE, process.cwd(), "");
 
   function getBuildTarget(browsers) {
