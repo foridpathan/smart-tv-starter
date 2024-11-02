@@ -1,219 +1,305 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This guide is particularly focused on leveraging Vite’s configuration options to build for specific platforms like Tizen and WebOS and covers setting up navigation and routing within the app.
 
-Currently, two official plugins are available:
+## Project Setup
+Let’s start by setting up a new React project with Vite and tailoring the configuration to fit Smart TV specifications.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Step 1: Create the Vite Project
+**1. Initialize a Vite Project:**
+Create a new Vite project with React support.
 ```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
-
-
-
-Certainly! Below, I’ve provided descriptions and explanations to complement the code you’ve shared, organized into clear sections and bullet points.
-
-Building a Smart TV Application with React, Vite, and Spatial Navigation
-
-Smart TV applications are a growing area, enabling users to enjoy web applications on television screens. In this guide, we’ll walk through creating a Smart TV application with React and Vite for optimized builds. We’ll also use @noriginmedia/norigin-spatial-navigation to provide smooth directional navigation on TV remote controls.
-
-Our focus will be on configuring builds specifically for Tizen and WebOS platforms, while highlighting the unique aspects of each environment.
-
-Project Setup
-
-Step 1: Create the Vite Project
-
-	1.	Initialize a Vite Project:
-	•	Run the command below to create a new Vite project with React support.
-
-npm create vite@latest my-smart-tv-app --template react
+npm create vite@latest my-smart-tv-app - template react
 cd my-smart-tv-app
+```
 
-
-	2.	Install Dependencies:
-	•	Install necessary packages, including react-router-dom for routing, @noriginmedia/norigin-spatial-navigation for remote navigation, and tailwindcss for responsive design.
-
+**2. Install Dependencies:**
+Install necessary packages
+```
 npm install react-router-dom @noriginmedia/norigin-spatial-navigation tailwindcss
+```
 
-
-
-Step 2: Configuring Vite for Smart TV Platforms
+### Step 2: Configuring Vite for Smart TV Platforms
 
 This configuration step is essential for adapting the Vite build to meet the unique requirements of Smart TVs. Vite will be set up to output separate builds for Tizen and WebOS platforms, alongside a production build. We’ll also auto-configure platform-specific files, such as config.xml for Tizen and appinfo.json for WebOS.
 
-Folder Structure
+To simplify the build process, we define several custom scripts in `package.json`
+```JSON
+"scripts": {    
+    "copy:tizen": "node config/index.cjs tizen && node --experimental-modules config/tizen-script.cjs",
+    "copy:webos": "node config/index.cjs webos && node --experimental-modules config/webos-script.cjs && node config/fhd-script.cjs",
+    "platform:tizen": "export WEBPACK_MODE=tizen tsc && vite build && npm run copy:tizen",
+    "platform:webos": "export WEBPACK_MODE=webos tsc && vite build && npm run copy:webos",
+    "platform:build": "tsc && vite build",
+    "build": "npm-run-all --sequential platform:*",
+    ...
+}
+...
+```
+ - **Copy Scripts (copy:tizen and copy:webos):** These scripts copy the configuration files for each platform to their respective directories.
+ - **Platform Build Scripts (platform:tizen and platform:webos):** These scripts set the appropriate WEBPACK_MODE and execute the build for the specified platform.
+ - **Build Command:** Runs the platform build scripts in sequence to produce builds for both Tizen and WebOS.
 
-Here’s an organized project structure for managing configuration files and build outputs for multiple platforms:
+> **Note:** if you use Windows then please use `set` intend of `export` becuase `export` will not working in windows
 
-.
-├── build
-│   ├── tizen
-│   ├── webos
-│   │   ├── uhd
-│   │   └── fhd
-│   └── production
-├── config
-│   ├── index.cjs
-│   ├── webos-script.cjs
-│   ├── tizen-script.cjs
-│   ├── fhs-script.cjs
-│   ├── tizen
-│   │   └── All Tizen default configurations, .project, config.xml etc
-│   ├── webos
-│   │   └── Default configurations, assets, icons, appinfo.json etc
-│   └── fhd
-│       └── appinfo.json
-├── public
-├── src
-├── .env
-├── package.json
-├── postcss.config.js
-├── tsconfig.json
-└── vite.config.ts
+In your `vite.config.ts`, replace the content with the following configuration:
+```js
+import react from "@vitejs/plugin-react";
+import browserslist from "browserslist";
+import { resolveToEsbuildTarget } from "esbuild-plugin-browserslist";
+import path from "path";
+import tailwindcss from "tailwindcss";
+import { defineConfig, loadEnv } from "vite";
 
-Explanation of Key Scripts in package.json
+// https://vitejs.dev/config/
+export default defineConfig(() => {
+  const WEBPACK_MODE = process.env.WEBPACK_MODE?.trim() || "";
+  // File config for specific platform
+  const tizen = "tizen";
+  const webos = "webos";
 
-To simplify the build process, we define several custom scripts in package.json:
+  const tizenBuild = "build/tizen";
+  const webosBuild = "build/webos/uhd"; // WebOS have two app on UHD & FSD
 
-	•	Copy Scripts (copy:tizen and copy:webos):
-	•	These scripts copy the configuration files for each platform to their respective directories.
-	•	They run after the build is generated for the platform.
-	•	Platform Build Scripts (platform:tizen and platform:webos):
-	•	These scripts set the appropriate WEBPACK_MODE and execute the build for the specified platform.
-	•	On Windows, use set instead of export for setting the environment variable, as export is Unix-based.
-	•	Build Command:
-	•	Runs the platform build scripts in sequence to produce builds for both Tizen and WebOS.
+  // Determine the output directory based on the mode
+  const isTizen = WEBPACK_MODE === tizen;
+  const isWebOS = WEBPACK_MODE === webos;
+  const outDir = isTizen ? tizenBuild : isWebOS ? webosBuild : "build/production";
+  const env = loadEnv(WEBPACK_MODE, process.cwd(), "");
 
-Vite Configuration (vite.config.ts)
+  function getBuildTarget(browsers) {
+    return resolveToEsbuildTarget(browserslist(browsers), {
+      printUnknownTargets: false,
+    });
+  }
 
-This configuration handles platform-specific build optimizations for Smart TVs:
+  const baseConfig: any = {
+    plugins: [react(), tailwindcss()],
+    define: {
+      "process.env": env || {},
+    },
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
+    base: "./",
+    build: {
+      minify: "terser",
+      target: getBuildTarget([
+        ">0.1% and supports es6-module and not ios < 12 and not opera > 0",
+        "node >= 18.13.0",
+      ]),
+      outDir,
+      rollupOptions: {
+        input: {
+          app: path.resolve(__dirname, "index.html"),
+        },
+        output: {
+          manualChunks: undefined,
+        },
+      },
+      terserOptions: {
+        compress: {
+          drop_console: true,
+        },
+        format: {
+          comments: false,
+        },
+      },
+    },
+    test: {
+      globals: true,
+      environment: "jsdom",
+      setupFiles: "./src/__tests__/setup.ts",
+      css: true,
+    },
+  };
 
-	1.	Output Directory:
-	•	The outDir is set based on the WEBPACK_MODE environment variable, ensuring that each platform’s build is outputted to the correct folder.
-	2.	TailwindCSS Integration:
-	•	Integrated with Vite for responsive and customizable styling, particularly useful for TV interfaces.
-	3.	Browser Compatibility:
-	•	Uses browserslist for compatibility with Smart TV browsers, specifying ES6 modules and omitting older versions of iOS and Opera.
-	4.	Build Optimizations:
-	•	Removes console logs and minifies code for efficient performance on TV hardware.
+  if (isTizen || isWebOS) {
+    baseConfig.esbuild = {
+      minifyIdentifiers: false,
+      legalComments: "none",
+      target: "es6",
+      include: /\.(ts|jsx|tsx)$/,
+      define: {
+        "import.meta.url": JSON.stringify(""),
+      },
+    };
+  }
+  return baseConfig;
+});
+```
 
-Platform Configuration Files
+### Platform Configuration Files
 
-To streamline the configuration process, create the following configuration files to handle platform-specific tweaks:
+> To streamline the configuration process, create the following configuration files to handle platform-specific tweaks. All configuration file ander config folder:
 
-config/index.cjs
+In the main `App.js` wrap the app in a SpatialNavigation provider:
+```js
+import Layout from "@/components/layout";
+import { NavigationProvider } from "@/context";
+import Home from "@/pages/home";
+import Movies from "@/pages/movies";
+import Series from "@/pages/series";
+import Sports from "@/pages/sports";
+import { init } from "@noriginmedia/norigin-spatial-navigation";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-This script copies the configuration files (such as Tizen’s config.xml and WebOS’s appinfo.json) to the appropriate build directories based on the platform.
+init({
+  debug: false,
+  visualDebug: false,
+  distanceCalculationMethod: "center",
+});
+const Providers = () => {
+  return (
+    <NavigationProvider>
+      <Layout />
+    </NavigationProvider>
+  )
+}
+const route = [{
+  path: "/",
+  Component: Providers,
+  children: [
+    {
+      index: true,
+      Component: Home,
+    },
+    {
+      path: "movies",
+      Component: Movies,
+    },
+    {
+      path: "series",
+      Component: Series,
+    },
+    {
+      path: "sports",
+      Component: Sports,
+    },
+  ],
+}];
+const router = createMemoryRouter(route);
 
-config/tizen-script.cjs and config/webos-script.cjs
+export default function App() {
+  return (
+    <RouterProvider router={router} fallbackElement={<Fallback />} />
+  );
+}
+export function Fallback() {
+  return <>Loading</>;
+}
+```
 
-Each script performs the following:
+**Define Focusable Components:**
+Use the Focusable component to make elements navigable. Here’s an example:
 
-	1.	HTML Modification:
-	•	Ensures that the built index.html file is compatible with the platform’s requirements.
-	•	For instance, on Tizen, it replaces type="module" and crossorigin attributes with defer="defer", while on WebOS, it injects a webOSTV.js script.
+`home.tsx`
+```js
+import ContentRow from "@/components/ContentRow";
+import SelectedRow from "@/components/SelectedRow";
+import { FocusContext, useFocusable } from "@noriginmedia/norigin-spatial-navigation";
+import { useCallback, useEffect, useState } from "react";
 
-Adding Navigation with @noriginmedia/norigin-spatial-navigation
+const Home = () => {
+    const { ref, focusKey, focusSelf } = useFocusable({ focusKey: "CONTENT" });
+    const [selectedAsset, setSelectedAsset] = useState(null);
+    
+    useEffect(() => {
+        focusSelf();
+    }, [focusSelf]);
 
-For Smart TV applications, remote navigation should be intuitive. @noriginmedia/norigin-spatial-navigation simplifies directional navigation handling (up, down, left, right) to enhance usability.
+    const onAssetPress = useCallback((asset) => {
+        setSelectedAsset(asset);
+    }, []);
 
-Step 1: Set Up Routing and Navigation Provider
+    const onRowFocus = useCallback(
+        ({ y }: { y: number }) => {
+            ref.current.scrollTo({
+                top: y,
+                behavior: 'smooth'
+            });
+        },
+        [ref]
+    );
 
-In App.js, we wrap the app with a Spatial Navigation Provider:
+    return (
+        <FocusContext.Provider value={focusKey}>
+            <div className="flex flex-col h-full w-full">
+                <SelectedRow selectedAsset={selectedAsset} />
+                <div className="overflow-y-auto flex-1" ref={ref}>
+                    <div className="space-y-5">
+                        {rows.map(({ title }) => (
+                            <ContentRow
+                                key={title}
+                                title={title}
+                                onAssetPress={onAssetPress}
+                                onFocus={onRowFocus}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </FocusContext.Provider>
+    );
+};
 
-	•	Router Configuration:
-	•	Uses react-router-dom to set up a memory router for defining routes.
-	•	Routes for Home, Movies, Series, and Sports are defined.
-	•	Spatial Navigation:
-	•	The init() function sets up the navigation library with specific options, such as disabling debug mode.
+export default Home;
+```
 
-Step 2: Define Focusable Components
+`ContentRow.tsx` component
+```js
+import { FocusContext, useFocusable } from "@noriginmedia/norigin-spatial-navigation";
+import { useCallback, useRef } from "react";
+import Asset from "./Asset";
+const ContentRow = ({ title, onAssetPress, onFocus }) => {
+    const { ref, focusKey } = useFocusable({
+        onFocus
+    });
+    const scrollingRef = useRef(null);
+    const onAssetFocus = useCallback(
+        ({ x }: { x: number }) => {
+            scrollingRef.current.scrollTo({
+                left: x,
+                behavior: 'smooth'
+            });
+        },
+        [scrollingRef]
+    );
 
-Focusable components are essential for TV navigation, allowing users to move through items using their remote control.
+    return (
+        <FocusContext.Provider value={focusKey}>
+            <div
+                ref={ref}
+            >
+                <div className="text-2xl font-medium text-white pb-4 ">{title}</div>
+                <div className="overflow-x-auto overflow-y-hidden" ref={scrollingRef}>
+                    <div className="flex gap-2">
+                        {assets.map(({ title, color }) => (
+                            <Asset
+                                key={title}
+                                title={title}
+                                color={color}
+                                onEnterPress={onAssetPress}
+                                onFocus={onAssetFocus}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </FocusContext.Provider>
+    )
+}
+export default ContentRow
+```
+This setup provides a solid foundation for navigation in your Smart TV app. Focus states and navigation paths are handled automatically by the spatial navigation library, enhancing the user experience on TV devices.
 
-	1.	Home Page Component (home.tsx):
-	•	Contains multiple content rows that are vertically scrollable.
-	•	Uses the useFocusable hook to register each row as a focusable element.
-	2.	ContentRow Component (ContentRow.tsx):
-	•	Horizontally scrollable row with assets, such as movies or shows.
-	•	Each item triggers onAssetPress when selected, and uses onAssetFocus to manage scrolling when an item gains focus.
-	3.	Asset Component (Asset.tsx):
-	•	Represents an individual content item in a row.
-	•	Uses the useFocusable hook to manage focus state and calls onEnterPress when selected.
-
-Component Breakdown and Interaction
-
-Each component plays a role in managing navigation and interaction on the TV screen:
-
-	•	SelectedRow Component:
-	•	Displays details of the currently selected asset. Updated whenever a new item is selected.
-	•	ContentRow Component:
-	•	Registers each content row as a focusable area.
-	•	Handles horizontal scrolling within the row when focus moves between items.
-	•	Asset Component:
-	•	Sets focus on individual items (movies, series, etc.) and applies a border style when focused.
-
-Testing Your Smart TV App
-
-Testing the application on Smart TV emulators or directly on the device is crucial to ensure seamless navigation.
-
-	1.	Development Server:
-	•	Run the app locally using:
-
+**Start the Development Server:**
+```bash
 npm run dev
-
-	•	Test navigation to ensure each focusable element is accessible with remote controls.
-
-	2.	Production Build:
-	•	Create platform-specific builds for Tizen and WebOS using:
-
-WEBPACK_MODE=tizen npm run build
-WEBPACK_MODE=webos npm run build
-
-
-
-Conclusion
-
-Developing Smart TV applications with React and Vite offers a streamlined approach to building, optimizing, and deploying for platforms like Tizen and WebOS. With @noriginmedia/norigin-spatial-navigation, managing navigation becomes straightforward, ensuring a user-friendly experience on TV screens. This setup equips you to create a fully functional Smart TV application, ready for deployment.
-
-This completes the setup and explanations for your Smart TV application guide. Let me know if you’d like further clarification on any specific section!
+```
+**Build for Production:**
+To create platform-specific builds, set the WEBPACK_MODE environment variable and build:
+```bash
+npm run build
+```
