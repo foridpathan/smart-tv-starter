@@ -3,7 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://foridpathan.github.io/smart-tv-starter",
   "scripts": {
     "dev": "vite",
     "copy:tizen": "node config/index.cjs tizen && node --experimental-modules config/tizen-script.cjs",
