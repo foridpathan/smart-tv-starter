@@ -47,7 +47,7 @@ export default defineConfig(() => {
         strict: false,
       },
     },
-    base: "./",
+    base: "/smart-tv-starter/",
     build: {
       minify: "terser",
       target: getBuildTarget([
