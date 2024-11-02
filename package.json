@@ -13,7 +13,7 @@
     "build": "npm-run-all --sequential platform:*",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
+    "predeploy": "pnpm run build",
     "deploy": "gh-pages -d build"
   },
   "dependencies": {
